@@ -8,6 +8,7 @@ import java.util.Map;
 @Data
 @Document(collection = "productDetails")
 public class ProductDetails {
+    private String productId;
     private String title;
     private String price;
     private String description;
