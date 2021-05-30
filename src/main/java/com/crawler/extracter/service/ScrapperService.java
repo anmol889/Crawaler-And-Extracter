@@ -37,7 +37,7 @@ public class ScrapperService {
 
     public ResponseEntity<?> fetchingProductDetails(final String productId) {
         try{
-            long lastCrawled = crawlingEventCheck();
+            long lastCrawled = crawlingEventCheck(productId);
             log.debug("[fetchingProductDetails] lastCrawled: {}", lastCrawled);
             if(lastCrawled > MathsConstants.TIME_LIMIT){
                 WebDriver driver = gettingWebDriver(productId);
@@ -83,23 +83,51 @@ public class ScrapperService {
         return driver;
     }
 
-    public List<ProductDetails> findAllCrawledProducts() {
-        return productDetailsRepository.findAll();
-    }
-
-    public List<PriceTrend> gettingPriceTrend(final String productId) {
-        List<ProductDetails> productDetailsList = productDetailsRepository.findAllByProductIdOrderByTimestamp(productId);
-        List<PriceTrend> updatedProductDetailsList = new ArrayList<>();
-        for (ProductDetails productDetails : productDetailsList) {
-            PriceTrend priceTrend = new PriceTrend();
-            priceTrend.setTimestamp(productDetails.getTimestamp());
-            priceTrend.setPrice(productDetails.getPrice());
-            updatedProductDetailsList.add(priceTrend);
+    public ResponseEntity<?> findAllCrawledProducts() {
+        try{
+            List<ProductDetails> productDetailsList = productDetailsRepository.findAll();
+            if(!productDetailsList.isEmpty()){
+                return new ResponseEntity<>(productDetailsRepository.findAll(), HttpStatus.OK);
+            }
+            else{
+                ErrorResponse errorResponse = new ErrorResponse();
+                errorResponse.setErrorCode(500);
+                errorResponse.setMessage("productDetails data is not present in DB, as this page is not crawled yet");
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
-        return updatedProductDetailsList;
+        catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public ResponseEntity<?> fetchingProductDetailsHistory(String dateTime, String productId) throws ParseException {
+    public ResponseEntity<?> gettingPriceTrend(final String productId) {
+        try{
+            List<ProductDetails> productDetailsList = productDetailsRepository.findAllByProductIdOrderByTimestamp(productId);
+            if(!productDetailsList.isEmpty()){
+                List<PriceTrend> updatedProductDetailsList = new ArrayList<>();
+                for (ProductDetails productDetails : productDetailsList) {
+                    PriceTrend priceTrend = new PriceTrend();
+                    priceTrend.setTimestamp(productDetails.getTimestamp());
+                    priceTrend.setPrice(productDetails.getPrice());
+                    updatedProductDetailsList.add(priceTrend);
+                }
+                return new ResponseEntity<>(updatedProductDetailsList, HttpStatus.OK);
+            }
+            else{
+                ErrorResponse errorResponse = new ErrorResponse();
+                errorResponse.setErrorCode(500);
+                errorResponse.setMessage("productDetails data is not present in DB, as this page is not crawled yet");
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    public ResponseEntity<?> fetchingProductDetailsHistory(String dateTime, String productId)  {
         try{
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = df.parse(dateTime);
@@ -123,7 +151,7 @@ public class ScrapperService {
 
     public ResponseEntity<?> scrappingHtmlPage(final String productId) {
         try{
-            long lastCrawled = crawlingEventCheck();
+            long lastCrawled = crawlingEventCheck(productId);
             log.debug("[scrappingHtmlPage] lastCrawled: {}", lastCrawled);
             if(lastCrawled > MathsConstants.TIME_LIMIT) {
                 WebDriver driver = gettingWebDriver(productId);
@@ -144,16 +172,13 @@ public class ScrapperService {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
         }
     }
-    public long crawlingEventCheck() throws ParseException {
+    public long crawlingEventCheck(final String productId ) throws ParseException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        List<ProductDetails> productDetailsList = productDetailsRepository.findAll();
-        long lastCrawl = Long.MIN_VALUE;
-        for( ProductDetails productDetails : productDetailsList){
-            long epoch = df.parse(productDetails.getTimestamp()).getTime();
-            if(epoch>lastCrawl){
-                lastCrawl = epoch;
-            }
+        List<ProductDetails> productDetailsList = productDetailsRepository.findAllByProductIdOrderByTimestampDesc(productId);
+        if(productDetailsList.isEmpty()){
+            return Long.MAX_VALUE;
         }
+        long lastCrawl = df.parse(productDetailsList.get(0).getTimestamp()).getTime();
         long currentCrawl = System.currentTimeMillis();
         return currentCrawl - lastCrawl ;
     }

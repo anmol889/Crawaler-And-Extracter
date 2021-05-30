@@ -1,6 +1,5 @@
 package com.crawler.extracter.controller;
 
-import com.crawler.extracter.model.ProductDetails;
 import com.crawler.extracter.model.ProductDetailsRequest;
 import com.crawler.extracter.service.ScrapperService;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -34,9 +32,7 @@ public class ScrapperController {
     public Map<String, Object> allCrawledProducts() {
         Long from = System.currentTimeMillis();
         Map<String, Object> crawledDetails = new HashMap<>();
-        List<ProductDetails> productDetailsList = scrapperService.findAllCrawledProducts();
-        crawledDetails.put("ProductDetails", productDetailsList);
-        log.debug("[allCrawledProducts] productDetailsList: {}", productDetailsList);
+        crawledDetails.put("ProductDetails", scrapperService.findAllCrawledProducts().getBody());
         Long to = System.currentTimeMillis();
         crawledDetails.put("timeTaken",(to - from)/1000.0+" seconds");
         return crawledDetails;
@@ -47,7 +43,7 @@ public class ScrapperController {
         log.info("[priceTrend] productId: {}", productId);
         Long from = System.currentTimeMillis();
         Map<String, Object> priceTrendsMap = new HashMap<>();
-        priceTrendsMap.put("priceTrends",scrapperService.gettingPriceTrend(productId));
+        priceTrendsMap.put("priceTrends",scrapperService.gettingPriceTrend(productId).getBody());
         Long to = System.currentTimeMillis();
         priceTrendsMap.put("timeTaken",(to - from)/1000.0+" seconds");
         return  priceTrendsMap;
