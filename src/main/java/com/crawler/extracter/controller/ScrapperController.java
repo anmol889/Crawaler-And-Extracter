@@ -17,10 +17,10 @@ public class ScrapperController {
     ScrapperService scrapperService;
 
     @GetMapping("/getProductDetails/{productId}")
-    public Map<String, Object> gettingProductDetails(@PathVariable final String productId) {
+    public Map<String, Object> gettingProductDetails(@PathVariable final String productId) throws ParseException {
         Long from = System.currentTimeMillis();
         Map<String, Object> productDetailsMap = new HashMap<>();
-        productDetailsMap.put("productDetails", scrapperService.fetchingProductDetails(productId));
+        productDetailsMap.put("productDetails", scrapperService.fetchingProductDetails(productId).getBody());
         Long to = System.currentTimeMillis();
         productDetailsMap.put("timeTaken", (to - from)/1000.0+" seconds");
         return productDetailsMap;
@@ -57,10 +57,10 @@ public class ScrapperController {
     }
 
     @GetMapping("/getHtml/{productId}")
-    public Map<String, Object> fetchingHtmlPage(@PathVariable final String productId) {
+    public Map<String, Object> fetchingHtmlPage(@PathVariable final String productId)  {
         Long from = System.currentTimeMillis();
         Map<String, Object> htmlPageMap = new HashMap<>();
-        htmlPageMap.put("pageSource",scrapperService.scrappingHtmlPage(productId));
+        htmlPageMap.put("pageSource",scrapperService.scrappingHtmlPage(productId).getBody());
         Long to = System.currentTimeMillis();
         htmlPageMap.put("timeTaken",(to - from)/1000.0+" seconds");
         return htmlPageMap;
