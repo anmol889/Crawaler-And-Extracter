@@ -3,9 +3,11 @@ package com.crawler.extracter.service;
 import com.crawler.extracter.constants.CssSelectors;
 import com.crawler.extracter.constants.GatewayConstants;
 import com.crawler.extracter.mappers.ResponseMapper;
+import com.crawler.extracter.model.HtmlPageRequest;
 import com.crawler.extracter.model.PriceTrend;
 import com.crawler.extracter.model.ProductDetails;
-import com.crawler.extracter.repository.ScrapperRepository;
+import com.crawler.extracter.repository.HtmlPageRepository;
+import com.crawler.extracter.repository.ProductDetailsRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -23,7 +25,10 @@ import java.util.*;
 public class ScrapperService {
 
     @Autowired
-    private ScrapperRepository scrapperRepository;
+    private ProductDetailsRepository productDetailsRepository;
+
+    @Autowired
+    private HtmlPageRepository htmlPageRepository;
 
     public ProductDetails fetchingProductDetails(final String productId) {
         WebDriver driver = gettingWebDriver(productId);
@@ -34,7 +39,7 @@ public class ScrapperService {
         String totalCount = driver.findElement(By.cssSelector(CssSelectors.TOTAL_RATINGS_COUNT)).getText();
         Map<String, String> ratingMap = ratingStringToRatingMap(ratings, totalCount);
         ProductDetails productDetails = ResponseMapper.responseMapper(price, description, title, ratingMap, productId);
-        scrapperRepository.save(productDetails);
+        productDetailsRepository.save(productDetails);
         return productDetails;
     }
 
@@ -59,11 +64,11 @@ public class ScrapperService {
     }
 
     public List<ProductDetails> findAllCrawledProducts() {
-        return scrapperRepository.findAll();
+        return productDetailsRepository.findAll();
     }
 
     public List<PriceTrend> gettingPriceTrend(final String productId) {
-        List<ProductDetails> productDetailsList = scrapperRepository.findAllByProductIdOrderByTimestamp(productId);
+        List<ProductDetails> productDetailsList = productDetailsRepository.findAllByProductIdOrderByTimestamp(productId);
         List<PriceTrend> updatedProductDetailsList = new ArrayList<>();
         for (ProductDetails productDetails : productDetailsList) {
             PriceTrend priceTrend = new PriceTrend();
@@ -78,7 +83,7 @@ public class ScrapperService {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = df.parse(dateTime);
         long epoch = date.getTime();
-        List<ProductDetails> productDetailsList = scrapperRepository.findAllByProductIdOrderByTimestampDesc(productId);
+        List<ProductDetails> productDetailsList = productDetailsRepository.findAllByProductIdOrderByTimestampDesc(productId);
         for (ProductDetails productDetails : productDetailsList) {
             if (df.parse(productDetails.getTimestamp()).getTime() <= epoch) {
                 return new ResponseEntity<>(productDetails, HttpStatus.OK);
@@ -87,4 +92,12 @@ public class ScrapperService {
         return new ResponseEntity<>("page is not crawled before this date, please enter valid date", HttpStatus.BAD_REQUEST);
     }
 
+    public String scrappingHtmlPage(final String productId){
+        WebDriver driver = gettingWebDriver(productId);
+        HtmlPageRequest htmlPageRequest = new HtmlPageRequest();
+        htmlPageRequest.setProductId(productId);
+        htmlPageRequest.setHtmlPage(driver.getPageSource());
+        htmlPageRepository.save(htmlPageRequest);
+        return driver.getPageSource();
+    }
 }

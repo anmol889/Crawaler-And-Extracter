@@ -5,6 +5,9 @@ import com.crawler.extracter.model.PriceTrend;
 import com.crawler.extracter.model.ProductDetails;
 import com.crawler.extracter.model.ProductDetailsRequest;
 import com.crawler.extracter.service.ScrapperService;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,4 +42,8 @@ public class ScrapperController {
         return scrapperService.fetchingProductDetailsHistory(productDetailsRequest.getTimestamp(), productDetailsRequest.getProductId());
     }
 
+    @GetMapping("/getHtml/{productId}")
+    public String fetchingHtmlPage(@PathVariable final String productId) {
+        return scrapperService.scrappingHtmlPage(productId);
+    }
 }

@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface ScrapperRepository extends MongoRepository<ProductDetails,String> {
+public interface ProductDetailsRepository extends MongoRepository<ProductDetails,String> {
 
     List<ProductDetails> findAllByProductIdOrderByTimestamp(String productId);
     List<ProductDetails> findAllByProductIdOrderByTimestampDesc(String productId);
