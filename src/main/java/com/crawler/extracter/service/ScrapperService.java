@@ -10,6 +10,7 @@ import com.crawler.extracter.model.PriceTrend;
 import com.crawler.extracter.model.ProductDetails;
 import com.crawler.extracter.repository.HtmlPageRepository;
 import com.crawler.extracter.repository.ProductDetailsRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.xerces.xs.LSInputList;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -24,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ScrapperService {
 
@@ -36,6 +38,7 @@ public class ScrapperService {
     public ResponseEntity<?> fetchingProductDetails(final String productId) {
         try{
             long lastCrawled = crawlingEventCheck();
+            log.debug("[fetchingProductDetails] lastCrawled: {}", lastCrawled);
             if(lastCrawled > MathsConstants.TIME_LIMIT){
                 WebDriver driver = gettingWebDriver(productId);
                 String price = driver.findElement(By.cssSelector(CssSelectors.PRICE)).getText();
@@ -121,18 +124,19 @@ public class ScrapperService {
     public ResponseEntity<?> scrappingHtmlPage(final String productId) {
         try{
             long lastCrawled = crawlingEventCheck();
-            if(lastCrawled > 3600000) {
-            WebDriver driver = gettingWebDriver(productId);
-            HtmlPageRequest htmlPageRequest = new HtmlPageRequest();
-            htmlPageRequest.setProductId(productId);
-            htmlPageRequest.setHtmlPage(driver.getPageSource());
-            htmlPageRepository.save(htmlPageRequest);
-            return new ResponseEntity<>(driver.getPageSource(), HttpStatus.OK);
+            log.debug("[scrappingHtmlPage] lastCrawled: {}", lastCrawled);
+            if(lastCrawled > MathsConstants.TIME_LIMIT) {
+                WebDriver driver = gettingWebDriver(productId);
+                HtmlPageRequest htmlPageRequest = new HtmlPageRequest();
+                htmlPageRequest.setProductId(productId);
+                htmlPageRequest.setHtmlPage(driver.getPageSource());
+                htmlPageRepository.save(htmlPageRequest);
+                return new ResponseEntity<>(driver.getPageSource(), HttpStatus.OK);
         }
             else{
                 ErrorResponse errorResponse = new ErrorResponse();
                 errorResponse.setErrorCode(406);
-                errorResponse.setMessage("requested page is just crawled, please try after "+(3600000-lastCrawled)/60000+" minutes");
+                errorResponse.setMessage("requested page is just crawled, please try after "+(MathsConstants.TIME_LIMIT-lastCrawled)/MathsConstants.MIN_CONVERTER+" minutes");
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
             }
         }

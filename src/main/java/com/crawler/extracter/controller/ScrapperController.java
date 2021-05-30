@@ -1,14 +1,17 @@
 package com.crawler.extracter.controller;
 
+import com.crawler.extracter.model.ProductDetails;
 import com.crawler.extracter.model.ProductDetailsRequest;
 import com.crawler.extracter.service.ScrapperService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class ScrapperController {
@@ -17,7 +20,8 @@ public class ScrapperController {
     ScrapperService scrapperService;
 
     @GetMapping("/getProductDetails/{productId}")
-    public Map<String, Object> gettingProductDetails(@PathVariable final String productId) throws ParseException {
+    public Map<String, Object> gettingProductDetails(@PathVariable final String productId)  {
+        log.info("[gettingProductDetails] productId: {}", productId);
         Long from = System.currentTimeMillis();
         Map<String, Object> productDetailsMap = new HashMap<>();
         productDetailsMap.put("productDetails", scrapperService.fetchingProductDetails(productId).getBody());
@@ -30,7 +34,9 @@ public class ScrapperController {
     public Map<String, Object> allCrawledProducts() {
         Long from = System.currentTimeMillis();
         Map<String, Object> crawledDetails = new HashMap<>();
-        crawledDetails.put("ProductDetails", scrapperService.findAllCrawledProducts());
+        List<ProductDetails> productDetailsList = scrapperService.findAllCrawledProducts();
+        crawledDetails.put("ProductDetails", productDetailsList);
+        log.debug("[allCrawledProducts] productDetailsList: {}", productDetailsList);
         Long to = System.currentTimeMillis();
         crawledDetails.put("timeTaken",(to - from)/1000.0+" seconds");
         return crawledDetails;
@@ -38,6 +44,7 @@ public class ScrapperController {
 
     @GetMapping("/priceTrend/{productId}")
     public Map<String, Object> priceTrend(@PathVariable final String productId) {
+        log.info("[priceTrend] productId: {}", productId);
         Long from = System.currentTimeMillis();
         Map<String, Object> priceTrendsMap = new HashMap<>();
         priceTrendsMap.put("priceTrends",scrapperService.gettingPriceTrend(productId));
@@ -48,6 +55,7 @@ public class ScrapperController {
 
     @PostMapping("/getProductDetailsHistory")
     public Map<String, Object> getProductDetailsHistory(@RequestBody ProductDetailsRequest productDetailsRequest) throws ParseException {
+        log.info("[getProductDetailsHistory] productDetailsRequest: {}", productDetailsRequest);
         Long from = System.currentTimeMillis();
         Map<String, Object> productDetailsHistoryMap = new HashMap<>();
         productDetailsHistoryMap.put("productDetail",scrapperService.fetchingProductDetailsHistory(productDetailsRequest.getTimestamp(), productDetailsRequest.getProductId()).getBody());
@@ -58,6 +66,7 @@ public class ScrapperController {
 
     @GetMapping("/getHtml/{productId}")
     public Map<String, Object> fetchingHtmlPage(@PathVariable final String productId)  {
+        log.info("[gettingProductDetails] productId: {}", productId);
         Long from = System.currentTimeMillis();
         Map<String, Object> htmlPageMap = new HashMap<>();
         htmlPageMap.put("pageSource",scrapperService.scrappingHtmlPage(productId).getBody());
