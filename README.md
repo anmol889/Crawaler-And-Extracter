@@ -5,9 +5,10 @@ In this problem, I am building a service which takes an input a product SKU (uni
 ### Setting it up
 1. Install JDK `version 12.0.2`.
 2. Install mongoDB `version v4.4.1`.
-3. Run `mvn spring-boot:run`
-4. Tomcat server will be started on default port 8080
-5. Now service is up, start your journey
+3. Create DB `AmazonCrawler`.
+4. Run `mvn spring-boot:run`
+5. Tomcat server will be started on default port 8080
+6. Now service is up, start your journey
 
 ### The following table shows overview of the Rest APIs that will be exported:
 
