@@ -5,8 +5,6 @@ import com.crawler.extracter.model.PriceTrend;
 import com.crawler.extracter.model.ProductDetails;
 import com.crawler.extracter.model.ProductDetailsRequest;
 import com.crawler.extracter.service.ScrapperService;
-import com.gargoylesoftware.htmlunit.html.HtmlAbbreviated;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
