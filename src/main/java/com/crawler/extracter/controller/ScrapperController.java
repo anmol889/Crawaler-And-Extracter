@@ -1,7 +1,9 @@
 package com.crawler.extracter.controller;
 
-import com.crawler.extracter.model.ProductDetailsRequest;
+import com.crawler.extracter.models.ProductDetailsRequest;
 import com.crawler.extracter.service.ScrapperService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api")
+@Api(value = "Crawler", description = "REST API for Crawler and Extractor", tags = { "Crawler" })
 public class ScrapperController {
 
     @Autowired
@@ -65,7 +68,7 @@ public class ScrapperController {
         log.info("[gettingProductDetails] productId: {}", productId);
         Long from = System.currentTimeMillis();
         Map<String, Object> htmlPageMap = new HashMap<>();
-        htmlPageMap.put("pageSource",scrapperService.scrappingHtmlPage(productId).getBody());
+        htmlPageMap.put("pageSource",scrapperService.scrappingHtmlPage(productId));
         Long to = System.currentTimeMillis();
         htmlPageMap.put("timeTaken",(to - from)/1000.0+" seconds");
         return htmlPageMap;

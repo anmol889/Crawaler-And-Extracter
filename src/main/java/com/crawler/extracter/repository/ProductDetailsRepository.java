@@ -1,6 +1,6 @@
 package com.crawler.extracter.repository;
 
-import com.crawler.extracter.model.ProductDetails;
+import com.crawler.extracter.models.ProductDetails;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

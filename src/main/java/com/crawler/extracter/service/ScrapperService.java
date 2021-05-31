@@ -1,17 +1,16 @@
 package com.crawler.extracter.service;
 
-import com.crawler.extracter.constants.CssSelectors;
+import com.crawler.extracter.constants.CssSelectorsConstants;
 import com.crawler.extracter.constants.GatewayConstants;
 import com.crawler.extracter.constants.MathsConstants;
 import com.crawler.extracter.mappers.ResponseMapper;
-import com.crawler.extracter.model.ErrorResponse;
-import com.crawler.extracter.model.HtmlPageRequest;
-import com.crawler.extracter.model.PriceTrend;
-import com.crawler.extracter.model.ProductDetails;
+import com.crawler.extracter.models.ErrorResponse;
+import com.crawler.extracter.models.HtmlPageRequest;
+import com.crawler.extracter.models.PriceTrend;
+import com.crawler.extracter.models.ProductDetails;
 import com.crawler.extracter.repository.HtmlPageRepository;
 import com.crawler.extracter.repository.ProductDetailsRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.xerces.xs.LSInputList;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -41,11 +40,11 @@ public class ScrapperService {
             log.debug("[fetchingProductDetails] lastCrawled: {}", lastCrawled);
             if(lastCrawled > MathsConstants.TIME_LIMIT){
                 WebDriver driver = gettingWebDriver(productId);
-                String price = driver.findElement(By.cssSelector(CssSelectors.PRICE)).getText();
-                String title = driver.findElement(By.cssSelector(CssSelectors.TITLE)).getText();
-                String description = driver.findElement(By.cssSelector(CssSelectors.DESCRIPTION)).getText();
-                String ratings = driver.findElement(By.cssSelector(CssSelectors.RATINGS)).getText();
-                String totalCount = driver.findElement(By.cssSelector(CssSelectors.TOTAL_RATINGS_COUNT)).getText();
+                String price = driver.findElement(By.cssSelector(CssSelectorsConstants.PRICE)).getText();
+                String title = driver.findElement(By.cssSelector(CssSelectorsConstants.TITLE)).getText();
+                String description = driver.findElement(By.cssSelector(CssSelectorsConstants.DESCRIPTION)).getText();
+                String ratings = driver.findElement(By.cssSelector(CssSelectorsConstants.RATINGS)).getText();
+                String totalCount = driver.findElement(By.cssSelector(CssSelectorsConstants.TOTAL_RATINGS_COUNT)).getText();
                 Map<String, String> ratingMap = ratingStringToRatingMap(ratings, totalCount);
                 ProductDetails productDetails = ResponseMapper.responseMapper(price, description, title, ratingMap, productId);
                 productDetailsRepository.save(productDetails);
@@ -92,7 +91,7 @@ public class ScrapperService {
             else{
                 ErrorResponse errorResponse = new ErrorResponse();
                 errorResponse.setErrorCode(500);
-                errorResponse.setMessage("productDetails data is not present in DB, as this page is not crawled yet");
+                errorResponse.setMessage("productDetails data is not present in DB, as no page is crawled yet");
                 return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -117,7 +116,7 @@ public class ScrapperService {
             else{
                 ErrorResponse errorResponse = new ErrorResponse();
                 errorResponse.setErrorCode(500);
-                errorResponse.setMessage("productDetails data is not present in DB, as this page is not crawled yet");
+                errorResponse.setMessage("productDetails data is not present in DB, as the page for requested product is not crawled yet");
                 return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -140,7 +139,7 @@ public class ScrapperService {
             }
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setErrorCode(400);
-            errorResponse.setMessage("page is not crawled before given date, please enter valid date");
+            errorResponse.setMessage("page is not crawled before given date and time, please enter valid date and time");
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
         catch(Exception e){

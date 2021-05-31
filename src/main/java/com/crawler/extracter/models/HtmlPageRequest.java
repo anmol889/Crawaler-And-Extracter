@@ -1,4 +1,4 @@
-package com.crawler.extracter.model;
+package com.crawler.extracter.models;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;

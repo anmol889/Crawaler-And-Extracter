@@ -1,6 +1,6 @@
 package com.crawler.extracter.mappers;
 
-import com.crawler.extracter.model.ProductDetails;
+import com.crawler.extracter.models.ProductDetails;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
