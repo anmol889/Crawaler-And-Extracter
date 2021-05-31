@@ -19,6 +19,6 @@ In this problem, I am building a service which takes an input a product SKU (uni
 - POST    `api/getProductDetailsHistory `                using this api, user can fetch latest productDetails to the given date
 - GET     `api/getHtml/{productId}  `                    fetching source page by passing productId
 
-###Note:
+### Note:
 1. Swagger documentation Url `http://localhost:8080/swagger-ui.html#/Crawler`
 2. Stable internet connection is required.
