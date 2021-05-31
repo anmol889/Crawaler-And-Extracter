@@ -10,6 +10,7 @@ In this problem, I am building a service which takes an input a product SKU (uni
 5. Tomcat server will be started on default port 8080
 6. Now service is up, start your journey
 
+
 ### The following table shows overview of the Rest APIs that will be exported:
 
 - GET     `api/getProductDetails/{productId}      `	     User can fetch product details by pasing productId
@@ -17,3 +18,7 @@ In this problem, I am building a service which takes an input a product SKU (uni
 - GET     `api/priceTrend/{productId}    `               price trend of the product can be seen here by passing productId
 - POST    `api/getProductDetailsHistory `                using this api, user can fetch latest productDetails to the given date
 - GET     `api/getHtml/{productId}  `                    fetching source page by passing productId
+
+####Note:
+1. Swagger documentation Url `http://localhost:8080/swagger-ui.html#/Crawler`
+2. Stable internet connection is required.
